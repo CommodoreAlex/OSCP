@@ -62,6 +62,7 @@ netstat -antup
 netstat -tulnp
 ifconfig
 ip route
+arp -a
 
 # Is anything vulnerable running under root process wise?
 ps aux | grep -i 'root' --color=auto
