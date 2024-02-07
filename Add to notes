@@ -2,8 +2,10 @@ nmap -sV -Pn -vv -p 445 --script='(smb*) and not (brute or broadcast or dos or e
 
 nmap -p 1433 --script ms-sql-info,ms-sql-empty-password,ms-sql-xp-cmdshell,ms-sql-config,ms-sql-ntlm-info,ms-sql-tables,ms-sql-hasdbaccess,ms-sql-dac,ms-sql-dump-hashes  --script-args mssql.instance-port=1433,mssql.username=sa,mssql.password=,mssql.instance-name=MSSQLSERVER $ip
 
-# Enumerate for files with 404 results ommitted 
-wfuzz -c -z file,/usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-files.txt --hc 404 http://192.168.1.1
+# Enumerate for files with 404 results ommitted: /FUZZ for files
+wfuzz -c -z file,/usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-files.txt --hc 404 http://192.168.1.1/FUZZ
+# Enumerate for directores /FUZZ/ for directories
+wfuzz -c -z file,/usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-directories.txt --hc 404 http://192.168.1.1/FUZZ/
 
 # We can test to see if we have command execution when there is no output by using ping
 ping -c 3 $ip # in the non-verbose command shell
