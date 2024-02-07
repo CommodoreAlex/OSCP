@@ -4,3 +4,8 @@ nmap -p 1433 --script ms-sql-info,ms-sql-empty-password,ms-sql-xp-cmdshell,ms-sq
 
 # Enumerate for files with 404 results ommitted 
 wfuzz -c -z file,/usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-files.txt --hc 404 http://192.168.1.1
+
+# We can test to see if we have command execution when there is no output by using ping
+ping -c 3 $ip # in the non-verbose command shell
+# Look for ICMP requests on our end
+tcpdump -i any "icmp"
