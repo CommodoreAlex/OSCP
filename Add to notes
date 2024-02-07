@@ -6,6 +6,10 @@ nmap -p 1433 --script ms-sql-info,ms-sql-empty-password,ms-sql-xp-cmdshell,ms-sq
 wfuzz -c -z file,/usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-files.txt --hc 404 http://192.168.1.1/FUZZ
 # Enumerate for directores /FUZZ/ for directories
 wfuzz -c -z file,/usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-directories.txt --hc 404 http://192.168.1.1/FUZZ/
+# Enumerate for words
+wfuzz -c -z file,/usr/share/wordlists/Seclists/Discovery/Web-Content/raft-medium-words.txt --hc 404 http://192.168.1.1/secret/FUZZ.php
+
+
 
 # We can test to see if we have command execution when there is no output by using ping
 ping -c 3 $ip # in the non-verbose command shell
