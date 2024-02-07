@@ -9,3 +9,7 @@ wfuzz -c -z file,/usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-
 ping -c 3 $ip # in the non-verbose command shell
 # Look for ICMP requests on our end
 tcpdump -i any "icmp"
+
+# Privilege Escalation
+# When on the box you can type 'which mysql' and then try default credentials
+mysql -uroot -p # unauthenticated login on the localhost
